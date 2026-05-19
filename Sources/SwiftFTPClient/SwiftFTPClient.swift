@@ -238,23 +238,20 @@ public class FTPClient {
         
         // Send file data
         //let bufferSize = 1024 * 1024 // 1MB buffer
-        while true {
+       while true {
             if isCancelled {
                 dataConnection.cancel()
                 throw FTPError.cancelled
             }
-            
-            if #available(macOS 10.15.4, *) {
-                let data = try fileHandle.read(upToCount: bufferSize)
-                if let data = data, !data.isEmpty {
-                    try await sendData(data: data, over: dataConnection)
-                    progress.completedUnitCount += Int64(data.count)
-                    progressHandler(progress)
-                } else {
-                    break
-                }
+        
+            let data = try fileHandle.read(upToCount: bufferSize)
+        
+            if let data = data, !data.isEmpty {
+                try await sendData(data: data, over: dataConnection)
+                progress.completedUnitCount += Int64(data.count)
+                progressHandler(progress)
             } else {
-                fatalError("SwiftFTPClient requires macOS 10.15.4 or later.")
+                break
             }
         }
         
