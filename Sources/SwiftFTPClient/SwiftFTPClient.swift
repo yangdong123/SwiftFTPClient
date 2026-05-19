@@ -244,8 +244,8 @@ public class FTPClient {
                 throw FTPError.cancelled
             }
         
-            let data = try fileHandle.read(upToCount: bufferSize)
-        
+            //let data = try fileHandle.read(upToCount: bufferSize)
+            let data = fileHandle.readData(ofLength: bufferSize)
             if let data = data, !data.isEmpty {
                 try await sendData(data: data, over: dataConnection)
                 progress.completedUnitCount += Int64(data.count)
