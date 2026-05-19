@@ -239,19 +239,17 @@ public class FTPClient {
         // Send file data
         //let bufferSize = 1024 * 1024 // 1MB buffer
        while true {
-            if isCancelled {
-                dataConnection.cancel()
-                throw FTPError.cancelled
-            }
-        
-            //let data = try fileHandle.read(upToCount: bufferSize)
-            let data = fileHandle.readData(ofLength: bufferSize)
-            if let data = data, !data.isEmpty {
-                try await sendData(data: data, over: dataConnection)
-                progress.completedUnitCount += Int64(data.count)
-                progressHandler(progress)
+            if #available(iOS 13.4, *) {
+            let data = try fileHandle.read(upToCount: bufferSize)
+                if let data = data, !data.isEmpty {
+                    try await sendData(data: data, over: dataConnection)
+                    progress.completedUnitCount += Int64(data.count)
+                    progressHandler(progress)
+                } else {
+                    break
+                }
             } else {
-                break
+                fatalError("SwiftFTPClient requires iOS 13.4 or later.")
             }
         }
         
